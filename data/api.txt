@@ -1,0 +1,77 @@
+https://data.ssb.no/api/v0/no/table/12558/
+
+{
+  "query": [
+    {
+      "code": "Region",
+      "selection": {
+        "filter": "vs:Kommune",
+        "values": [
+          "0101",
+          "0102",
+          "0103",
+          "0104",
+          "0105",
+          "0106"
+        ]
+      }
+    },
+    {
+      "code": "InntektSkatt",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "00"
+        ]
+      }
+    },
+    {
+      "code": "Desiler",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "01",
+          "02",
+          "09",
+          "10"
+        ]
+      }
+    },
+    {
+      "code": "ContentsCode",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "AndelHush"
+        ]
+      }
+    },
+    {
+      "code": "Tid",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "2016",
+          "2017"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}
+
+Fra dette kan vi finne ut at:
+Navn på tabell:
+  urlToData = "12558",
+Region er hvilke kommuner vi ønsker data for (for oss er disse i vektoren knr)
+    Region = knr,
+Vi ønsker svar basert på inntekt før skatt
+    InntektSkatt = "00",
+Desilene (angis som tekststreng) vi vil ha data for
+    Desiler = c("01", "02", "09", "10"),
+Hvilken enhet vi vil ha data for
+    ContentsCode = "AndelHush",
+Tidsperioden (vi vil ha årene 2008 til 2017). Ser at de må angis som tekststreng, derfor as.character()
+    Tid = as.character(2008:2017)
