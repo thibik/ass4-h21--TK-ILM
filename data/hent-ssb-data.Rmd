@@ -1,9 +1,17 @@
 ---
-title: "R Notebook"
+title: "hent-ssb-data"
+author:
+  - "Ingrid-Liv Morkken"
+  - "Thibiga Kuddyar"
+frontsize: 12pt 
 output:
   pdf_document: default
   html_notebook: default 
+lang: no-NB
 ---
+```{r}
+knitr::opts_chunk$set(eval=FALSE)
+```
 
 ```{r Setup}
 suppressPackageStartupMessages({
@@ -41,11 +49,8 @@ pm2 <- pm2_raw$dataset %>%
 ```
 
 ```{r}
-pm2 <- pm2 %>% 
-  select(knr, aar, pm2)
 head(pm2)
 ```
-
 
 ```{r}
 names(pm2_raw)[[1]] <- "desc"
@@ -56,11 +61,12 @@ pm2 <- pm2 %>%
   mutate(
     knavn = pm2_raw$desc$region) %>% 
       group_by(knr) %>% 
-      select(knr,aar, pm2, knavn)
+      select(knr,knavn, aar, pm2)
 ```
 
 ```{r}
 load("test_string_tib.Rdata")
+
 moenster <- '\\s*\\([\\d\\s-]*\\d*\\)\\s*$'
 ```
 
@@ -106,14 +112,15 @@ pm2_2008 %>%
 ```
 
 ```{r}
-pm2 <- pm2_2008 %>% 
-  na.omit(pm2)
+pm2 <- pm2 %>% 
+  left_join(pm2_2008) %>% 
+  na.omit()
 ```
 
 
 ```{r}
 # time to clean up
-rm(pm2_raw, test_string_tib)
+rm(pm2_raw)
 ```
 
 # Befolkning 
@@ -157,7 +164,9 @@ pop_08_17_ya <- pop_08_17_ya %>%
 ```{r}
 dim(pop_08_17_ya)
 ```
-# TIL OSS: Vi får 4230 når det skulle ha vært 2140. 
+```{r}
+names(pop_08_17_ya)
+```
 
 
 ```{r}
@@ -171,6 +180,7 @@ pop_08_17_raw <- ApiData(
 )$dataset %>% 
   select(-ContentsCode)
 ```
+
 
 ```{r}
 pop_08_17 <- pop_08_17_raw %>% 
@@ -221,6 +231,7 @@ names(pop_08_17)
 pop_08_17_ya_p <- merge(pop_08_17, pop_08_17_ya)
 ```
 
+
 ```{r}
 pop_08_17_ya_p <- pop_08_17_ya_p %>% 
   mutate(Menn_ya_p = ya_Menn/Menn_t*100) %>% 
@@ -237,6 +248,17 @@ pop_08_17_ya_p <- pop_08_17_ya_p %>%
 ```{r}
 head(pop_08_17_ya_p, n=5)
 ```
+
+```{r}
+pm2 <- merge(pm2, pop_08_17_ya_p)
+```
+
+
+```{r}
+pm2 <- pm2 %>% 
+  select(knr, knavn, aar, pm2, Menn_ya_p, Kvinner_ya_p, Total_ya_p)
+```
+
 
 ```{r}
 rm(pop_08_17_raw, pop_08_17_ya_raw, pop_08_17, pop_08_17_ya, pm2_2006, pm2_2008)
@@ -259,39 +281,11 @@ inc_08_17_raw <- ApiData(
 ```
 
 ```{r}
-inc_08_17_raw <- ApiData(
-  urlToData="12558",
-  Region = knr,
-  Desiler = c("01", "02", "09", "10"),
-  ContentsCode = "AndelHush",
-  InntektSkatt ="00",
-  Tid = c(
-    as.character(2008:2017)
-  )
-)$dataset %>% 
-  select(Region, Desiler, Tid, value)
-```
-
-
-# Utdanning
-
-```{r}
-utdanning_08_17 <- ApiData(
-  urlToData = "09429",
-  Region = knr,
-  Nivaa = c("03a", "04a"),
-  Kjonn = c(1,2),
-  ContentsCode = "Personer",
-  Tid = c(as.character(2008:2017))
-  )$dataset %>% 
-  select(-ContentsCode, -value)
-```
-
-```{r}
 inc_08_17 <- inc_08_17_raw %>% 
   pivot_wider(
-    names_from = Desiler,
-    values_from = value)
+    names_from= Desiler,
+    values_from= value
+  )
 ```
 
 ```{r}
@@ -302,7 +296,6 @@ names(inc_08_17)[[4]]<- "Desil_2"
 names(inc_08_17)[[5]]<- "Desil_9"
 names(inc_08_17)[[6]]<- "Desil_10"
 ```
-
 
 ```{r}
 inc_08_17 <- inc_08_17 %>% 
@@ -322,7 +315,6 @@ names(inc_08_17)
 ```{r}
 dim(inc_08_17)
 ```
-
 ```{r}
 pm2 <- merge(pm2, inc_08_17)
 ```
@@ -330,6 +322,7 @@ pm2 <- merge(pm2, inc_08_17)
 ```{r}
 rm(inc_08_17, inc_08_17_raw, pop_08_17_ya_p)
 ```
+
 
 
 # Prosent av befolkning med universitet/høgskolen utdanning 
@@ -349,30 +342,33 @@ uni_p_raw <- ApiData(
 ```
 
 ```{r}
-uni_p_raw <- tibble(
-  knr = uni_p_raw$dataset$Region,
-  aar = uni_p_raw$dataset$Tid,
-  Kjonn = uni_p_raw$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$kjønn,
-  Nivaa = uni_p_raw$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$nivå,
-  uni_p = uni_p_raw$dataset$value
-)
-
-head(uni_p_raw, n=5)
+uni_p <- uni_p_raw
 ```
 
 
+```{r}
+uni_p <- tibble(
+  knr = uni_p$dataset$Region,
+  aar = uni_p$dataset$Tid,
+  Kjonn = uni_p$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$kjønn,
+  nivaa = uni_p$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$nivå,
+  uni_p = uni_p$dataset$value
+)
+
+head(uni_p, n=5)
+```
+
 
 ```{r}
-uni_p_raw <- uni_p_raw %>%
-  mutate(
-    Nivaa = fct_recode(Nivaa, 
+uni_p <- uni_p %>%
+  mutate(nivaa = fct_recode(nivaa, 
                        "uni_k" = "Universitets- og høgskolenivå, kort",
                        "uni_i" = "Universitets- og høgskolenivå, lang"))
 ```
 
 
 ```{r}
-uni_p_raw <- uni_p_raw %>%
+uni_p <- uni_p %>%
   mutate(
     Kjonn = fct_recode(Kjonn, 
                        "mf" = "Begge kjønn",
@@ -383,17 +379,78 @@ uni_p_raw <- uni_p_raw %>%
 ```
 
 ```{r}
-uni_p_raw <- uni_p_raw %>%
-  mutate(
-    
+uni_p <- uni_p %>%
+  pivot_wider(
+    id_cols=c(knr, aar),
+    names_from= c(nivaa, Kjonn),
+    values_from= uni_p
   )
 ```
 
 ```{r}
-head(uni_p_raw, n = 8)
+head(uni_p, n = 8)
 ```
+
+```{r}
+pm2 <- merge(pm2, uni_p)
+```
+
+```{r}
+rm(uni_p, uni_p_raw)
+```
+
+
+```{r}
+trade_08_17 <- ApiData(
+  urlToData= "04776",
+  Region = knr, 
+  Tid = c(as.character(2008:2017))
+)
+```
+
+
+```{r}
+trade_08_17 <- tibble(
+  aar = trade_08_17$dataset$Tid,
+  Trade_p = trade_08_17$dataset$value,
+  knr = trade_08_17$dataset$Region
+)
+```
+
+```{r}
+Trade_pc <- trade_08_17
+```
+
+```{r}
+pm2 <- merge(pm2, Trade_pc)
+```
+
+
+```{r}
+rm(trade_08_17, Trade_pc)
+```
+
 ```{r}
 dim(pm2)
 ```
 
+```{r}
+names(pm2)
+```
+
+```{r}
+pm2 %>% 
+  select(knr:inc_k5) %>% 
+  head(n=8)
+```
+
+```{r}
+pm2 %>% 
+  select(uni_k_mf:Trade_p) %>% 
+  head(n=8)
+```
+
+```{r}
+write.csv(pm2, "pm2.csv")
+```
 
