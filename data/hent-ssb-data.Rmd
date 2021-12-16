@@ -2,7 +2,7 @@
 title: "R Notebook"
 output:
   pdf_document: default
-  html_notebook: default
+  html_notebook: default 
 ---
 
 ```{r Setup}
@@ -315,12 +315,24 @@ inc_08_17 <- inc_08_17 %>%
   select(knr, aar, inc_k1, inc_k5)
 ```
 
+```{r}
+names(inc_08_17)
+```
+
+```{r}
+dim(inc_08_17)
+```
+
+```{r}
+pm2 <- merge(pm2, inc_08_17)
+```
+
+```{r}
+rm(inc_08_17, inc_08_17_raw, pop_08_17_ya_p)
+```
 
 
-
-
-
-# Handelsomsetning per innbygger
+# Handelsomsetning per innbygger - **hvor hører dette til?**
 
 ```{r}
 trade_08_17 <- ApiData(
@@ -331,5 +343,36 @@ trade_08_17 <- ApiData(
 ```{r}
 Trade_pc <- 
 ```
+
+# Prosent av befolkning med universitet/høgskolen utdanning 
+
+```{r}
+uni_p_raw <- ApiData(
+  urlToData = "09429",
+  Region = knr, 
+  Nivaa = c("03a", "04a"),
+  Kjonn = TRUE,
+  ContentsCode = "PersonerProsent",
+  Tid = c(
+    as.charachter(2008:2017)
+    
+  )
+)
+```
+
+```{r}
+uni_p_raw <- tibble(
+  knr = uni_p_raw$dataset$Region,
+  aar = uni_p_raw$dataset$Tid,
+  Kjonn = uni_p_raw$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$kjønn,
+  Nivaa = uni_p_raw$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$nivå,
+  uni_p = uni_p_raw$dataset$value
+)
+
+head(uni_p_raw, n=5)
+```
+
+
+
 
 
