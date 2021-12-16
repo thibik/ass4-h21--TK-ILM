@@ -242,6 +242,37 @@ head(pop_08_17_ya_p, n=5)
 rm(pop_08_17_raw, pop_08_17_ya_raw, pop_08_17, pop_08_17_ya, pm2_2006, pm2_2008)
 ```
 
+# Intektsdesiler 
+
+```{r}
+inc_08_17_raw <- ApiData(
+  urlToData = "12558",
+  Region = knr,
+  Desiler = c("01", "02", "09", "10"),
+  ContentsCode = "AndelHush",
+  InntektSkatt = "00",
+  Tid = c(
+    as.character(2008:2017)
+  )
+)$dataset %>% 
+  select(Region, Desiler, Tid, value)
+```
+
+```{r}
+inc_08_17_raw <- ApiData(
+  urlToData="12558",
+  Region = knr,
+  Desiler = c("01", "02", "09", "10"),
+  ContentsCode = "AndelHush",
+  InntektSkatt ="00",
+  Tid = c(
+    as.character(2008:2017)
+  )
+)$dataset %>% 
+  select(Region, Desiler, Tid, value)
+```
+
+
 # Utdanning
 
 ```{r}
@@ -254,6 +285,51 @@ utdanning_08_17 <- ApiData(
   Tid = c(as.character(2008:2017))
   )$dataset %>% 
   select(-ContentsCode, -value)
+```
+
+```{r}
+inc_08_17 <- inc_08_17_raw %>% 
+  pivot_wider(
+    names_from = Desiler,
+    values_from = value)
+```
+
+```{r}
+names(inc_08_17)[[1]]<- "knr"
+names(inc_08_17)[[2]]<- "aar"
+names(inc_08_17)[[3]]<- "Desil_1"
+names(inc_08_17)[[4]]<- "Desil_2"
+names(inc_08_17)[[5]]<- "Desil_9"
+names(inc_08_17)[[6]]<- "Desil_10"
+```
+
+
+```{r}
+inc_08_17 <- inc_08_17 %>% 
+  mutate(inc_k1 = Desiø_1 + Desil_2) %>% 
+  mutate(inc_k5 = Desil_9 + Desil_10)
+```
+
+```{r}
+inc_08_17 <- inc_08_17 %>% 
+  select(knr, aar, inc_k1, inc_k5)
+```
+
+
+
+
+
+
+# Handelsomsetning per innbygger
+
+```{r}
+trade_08_17 <- ApiData(
+  urlToData = "04776",
+  Region = knr
+```
+
+```{r}
+Trade_pc <- 
 ```
 
 
