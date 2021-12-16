@@ -376,7 +376,7 @@ uni_p_raw <- uni_p_raw %>%
   mutate(
     Kjonn = fct_recode(Kjonn, 
                        "mf" = "Begge kjønn",
-                       "f" = "Kvinner"
+                       "f" = "Kvinner",
                        "m" = "Menn"
     )
   )
