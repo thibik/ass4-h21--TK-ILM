@@ -1,0 +1,131 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r Setup}
+suppressPackageStartupMessages({
+library(PxWebApiData)
+library(tidyverse)
+library(lubridate)
+})
+knitr::opts_chunk$set(echo=FALSE, include=FALSE)
+```
+
+
+```{r}
+load("~/Data Science MSB105/ass4-h21--TK-ILM/data/knr.Rdata")
+```
+
+```{r}
+pm2_raw <- ApiData(
+  urlToData = "06035",
+  Region = knr,
+  ContentsCode = "KvPris",
+  Boligtype = "01",
+  Tid = c(as.character(2002:2017))
+)
+```
+
+```{r}
+pm2 <- pm2_raw$dataset %>% 
+  tibble() %>% 
+  select(-Boligtype, -ContentsCode) %>%
+  rename(
+     knr = Region,
+     aar = Tid, 
+     pm2 = value
+  )
+head(pm2)
+```
+
+```{r}
+names(pm2_raw)[[1]] <- "desc"
+```
+
+```{r}
+pm2 <- pm2 %>% 
+  mutate(
+    knavn = pm2_raw$desc$region) %>% 
+      group_by(knr) %>% 
+      select(knr,aar, pm2, knavn)
+```
+
+```{r}
+load("test_string_tib.Rdata")
+moenster <- '\\s+\\(\\d*[19-]\\d*[2019]\\)\\s*$'
+
+test_string_tib %>% 
+  mutate(
+    knavn = str_replace(knavn, moenster, "")
+  )
+```
+
+```{r}
+pm2 <- pm2 %>% 
+  mutate(
+    knavn = str_replace(knavn, moenster, "")
+  )
+```
+
+```{r}
+pm2 %>% 
+  map_df(is.na) %>% 
+  map_df(sum) %>% 
+  as.tibble()
+```
+
+```{r}
+pm2_2006 <- pm2 %>% 
+  filter(aar >= 2006) %>% 
+  pivot_wider(names_from = aar,
+              values_from = pm2
+              )
+```
+
+```{r}
+pm2_2008 <- pm2 %>% 
+  filter(aar >= 2008) %>% 
+  pivot_wider(names_from = aar,
+              values_from = pm2
+              )
+```
+
+
+```{r}
+pm2_2006 %>% 
+  complete.cases() %>% 
+  sum
+```
+```{r}
+pm2_2008 %>% 
+  complete.cases() %>% 
+  sum
+```
+
+
+```{r}
+# time to clean up
+rm( pm2_raw)
+```
+
+# Befolkning 
+
+- finne prosentandelen av befolkningen i hver kommune
+- ikke direkte tilgjengelig 
+- tbl 07459: personer 20-64 år og belfolkningsvolum 
+
+```{r}
+pop_08_17_ya_raw <- ApiData(
+  urlToData = "07459",
+  Region = knr,
+  Kjonn = c(1,2),
+  Alder =list("agg:TredeltGrupperingB2",
+              c("F20-64")),
+  Tid = c(as.character(2008:2017))
+  )$dataset %>% 
+  select(-ContentsCode, -Alder)
+```
+
+
+
