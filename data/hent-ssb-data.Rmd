@@ -306,7 +306,7 @@ names(inc_08_17)[[6]]<- "Desil_10"
 
 ```{r}
 inc_08_17 <- inc_08_17 %>% 
-  mutate(inc_k1 = Desiø_1 + Desil_2) %>% 
+  mutate(inc_k1 = Desil_1 + Desil_2) %>% 
   mutate(inc_k5 = Desil_9 + Desil_10)
 ```
 
@@ -332,18 +332,6 @@ rm(inc_08_17, inc_08_17_raw, pop_08_17_ya_p)
 ```
 
 
-# Handelsomsetning per innbygger - **hvor hører dette til?**
-
-```{r}
-trade_08_17 <- ApiData(
-  urlToData = "04776",
-  Region = knr
-```
-
-```{r}
-Trade_pc <- 
-```
-
 # Prosent av befolkning med universitet/høgskolen utdanning 
 
 ```{r}
@@ -354,7 +342,7 @@ uni_p_raw <- ApiData(
   Kjonn = TRUE,
   ContentsCode = "PersonerProsent",
   Tid = c(
-    as.charachter(2008:2017)
+    as.character(2008:2017)
     
   )
 )
@@ -370,6 +358,16 @@ uni_p_raw <- tibble(
 )
 
 head(uni_p_raw, n=5)
+```
+
+
+
+```{r}
+uni_p_raw <- uni_p_raw %>%
+  mutate(
+    nivaa = fct_recode(nivaa, 
+                       "uni_k" = "Universitets- og høgskolenivå, kort",
+                       "uni_i" = "Universitets- og høgskolenivå, lang"))
 ```
 
 
