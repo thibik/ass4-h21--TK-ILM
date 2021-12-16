@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 ```{r Setup}
@@ -36,8 +38,14 @@ pm2 <- pm2_raw$dataset %>%
      aar = Tid, 
      pm2 = value
   )
+```
+
+```{r}
+pm2 <- pm2 %>% 
+  select(knr, aar, pm2)
 head(pm2)
 ```
+
 
 ```{r}
 names(pm2_raw)[[1]] <- "desc"
@@ -53,20 +61,15 @@ pm2 <- pm2 %>%
 
 ```{r}
 load("test_string_tib.Rdata")
-moenster <- '\\s+\\(\\d*[19-]\\d*[2019]\\)\\s*$'
-
-test_string_tib %>% 
-  mutate(
-    knavn = str_replace(knavn, moenster, "")
-  )
+moenster <- '\\s*\\([\\d\\s-]*\\d*\\)\\s*$'
 ```
 
 ```{r}
 pm2 <- pm2 %>% 
   mutate(
-    knavn = str_replace(knavn, moenster, "")
-  )
+    knavn = str_replace(knavn, moenster, ""))
 ```
+
 
 ```{r}
 pm2 %>% 
@@ -79,8 +82,13 @@ pm2 %>%
 pm2_2006 <- pm2 %>% 
   filter(aar >= 2006) %>% 
   pivot_wider(names_from = aar,
-              values_from = pm2
-              )
+              values_from = pm2)
+```
+
+```{r}
+pm2_2006 %>% 
+  complete.cases() %>% 
+  sum
 ```
 
 ```{r}
@@ -91,29 +99,24 @@ pm2_2008 <- pm2 %>%
               )
 ```
 
-
-```{r}
-pm2_2006 %>% 
-  complete.cases() %>% 
-  sum
-```
 ```{r}
 pm2_2008 %>% 
   complete.cases() %>% 
   sum
 ```
 
+```{r}
+pm2 <- pm2_2008 %>% 
+  na.omit(pm2)
+```
+
 
 ```{r}
 # time to clean up
-rm( pm2_raw)
+rm(pm2_raw, test_string_tib)
 ```
 
 # Befolkning 
-
-- finne prosentandelen av befolkningen i hver kommune
-- ikke direkte tilgjengelig 
-- tbl 07459: personer 20-64 år og belfolkningsvolum 
 
 ```{r}
 pop_08_17_ya_raw <- ApiData(
@@ -127,5 +130,130 @@ pop_08_17_ya_raw <- ApiData(
   select(-ContentsCode, -Alder)
 ```
 
+
+```{r}
+pop_08_17_ya <- pop_08_17_ya_raw %>% 
+  pivot_wider(
+    id_cols = c(Region, Tid),
+    names_prefix= "sex",
+    names_from = Kjonn,
+    values_from = value)
+```
+
+
+```{r}
+names(pop_08_17_ya)[[1]] <- "knr"
+names(pop_08_17_ya)[[2]] <- "aar"
+names(pop_08_17_ya)[[3]] <- "ya_Menn"
+names(pop_08_17_ya)[[4]] <- "ya_Kvinner"
+```
+
+
+```{r}
+pop_08_17_ya <- pop_08_17_ya %>% 
+  mutate(ya_Total = ya_Menn+ya_Kvinner)
+```
+ 
+```{r}
+dim(pop_08_17_ya)
+```
+# TIL OSS: Vi får 4230 når det skulle ha vært 2140. 
+
+
+```{r}
+pop_08_17_raw <- ApiData(
+  urlToData = "07459",
+  Region = knr,
+  Kjonn = c(1,2),
+  Alder = list("agg:TodeltGrupperingB",
+               c("H17", "H18")),
+  Tid =c(as.character(2008:2017))
+)$dataset %>% 
+  select(-ContentsCode)
+```
+
+```{r}
+pop_08_17 <- pop_08_17_raw %>% 
+  pivot_wider(
+    names_from = Kjonn,
+    values_from =value)
+```
+
+
+```{r}
+names(pop_08_17)[[1]] <- "knr"
+names(pop_08_17)[[2]] <- "Alder"
+names(pop_08_17)[[3]] <- "aar"
+names(pop_08_17)[[4]] <- "Menn"
+names(pop_08_17)[[5]] <- "Kvinner"
+```
+
+```{r}
+pop_08_17 <- pop_08_17 %>% 
+  pivot_wider(
+    names_from = Alder,
+    values_from = c(Menn, Kvinner))
+```
+
+
+
+```{r}
+pop_08_17 <- pop_08_17 %>% 
+  mutate(Menn_t = Menn_H17 + Menn_H18) %>% 
+  mutate(Kvinner_t = Kvinner_H17 + Kvinner_H18) %>% 
+  mutate(Totalt_t = Menn_t + Kvinner_t)
+```
+
+```{r}
+pop_08_17 <- pop_08_17 %>% 
+  select(knr, aar, Menn_t, Kvinner_t, Totalt_t)
+```
+
+```{r}
+dim(pop_08_17)
+```
+
+```{r}
+names(pop_08_17)
+```
+
+```{r}
+pop_08_17_ya_p <- merge(pop_08_17, pop_08_17_ya)
+```
+
+```{r}
+pop_08_17_ya_p <- pop_08_17_ya_p %>% 
+  mutate(Menn_ya_p = ya_Menn/Menn_t*100) %>% 
+  mutate(Kvinner_ya_p = ya_Kvinner/Kvinner_t*100) %>% 
+  mutate(Total_ya_p = ya_Total/Totalt_t*100)
+```
+
+
+```{r}
+pop_08_17_ya_p <- pop_08_17_ya_p %>% 
+  select(knr, aar, Menn_ya_p, Kvinner_ya_p, Total_ya_p)
+```
+
+```{r}
+head(pop_08_17_ya_p, n=5)
+```
+
+```{r}
+rm(pop_08_17_raw, pop_08_17_ya_raw, pop_08_17, pop_08_17_ya, pm2_2006, pm2_2008)
+```
+
+# Utdanning
+
+```{r}
+utdanning_08_17 <- ApiData(
+  urlToData = "09429",
+  Region = knr,
+  Nivaa = c("03a", "04a"),
+  Kjonn = c(1,2),
+  ContentsCode = "Personer",
+  Tid = c(as.character(2008:2017))
+  )$dataset %>% 
+  select(-ContentsCode, -value)
+```
 
 
