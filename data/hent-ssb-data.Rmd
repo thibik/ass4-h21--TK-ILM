@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo=FALSE, include=FALSE)
 
 
 ```{r}
-load("~/Data Science MSB105/ass4-h21--TK-ILM/data/knr.Rdata")
+load("knr.Rdata")
 ```
 
 ```{r}
