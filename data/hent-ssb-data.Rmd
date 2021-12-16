@@ -392,5 +392,8 @@ uni_p_raw <- uni_p_raw %>%
 ```{r}
 head(uni_p_raw, n = 8)
 ```
+```{r}
+dim(pm2)
+```
 
 
