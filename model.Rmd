@@ -1,5 +1,85 @@
 ---
-title: "R Notebook"
+title: "Assignment 4"
+author:
+  - "Ingrid-Liv Morkken"
+  - "Thibiga Kuddyar"
 output: html_notebook
 ---
+
+```{r}
+suppressPackageStartupMessages({
+library(tidyverse)
+library(lubridate)
+library(modelr)
+library(broom)
+library(lmtest)
+library(sandwich)
+library(viridis)
+})
+knitr::opts_chunk$set(echo = FALSE, include = FALSE)
+```
+
+# Modeller
+
+## Leser inn data
+
+```{r}
+pm2 <- read_csv("data/pm2.csv", show_col_types = FALSE)
+```
+
+```{r}
+pm2 <- pm2 %>% 
+  mutate(
+    fnr = str_sub(knr, 1,2),
+    aar_f = str_sub(aar)
+  )
+```
+
+```{r}
+head(pm2)
+```
+
+
+
+
+```{r}
+pm2 %>% 
+  mutate(
+    fnr = parse_factor(fnr, levels =fnr),
+    aar_f = parse_factor(aar_f, levels = aar_f)
+  )
+```
+
+```{r}
+pm2 <- pm2 %>% 
+  mutate(
+    Trade_pc_100K = Trade_p/100000
+  )
+```
+
+```{r}
+head(pm2, n = 4)
+```
+
+```{r}
+mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_i_mf + Trade_pc_100K'
+```
+
+i.
+```{r}
+lm1 <- lm(mod1, data = pm2, subset = complete.cases(pm2))
+```
+
+```{r}
+summary(lm1)
+```
+
+ii. 
+```{r}
+pm2 %>% 
+  add_residuals(lm1)
+```
+
+
+
 
