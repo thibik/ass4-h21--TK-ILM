@@ -62,10 +62,12 @@ head(pm2, n = 4)
 ```
 
 ```{r}
-mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_i_mf + Trade_pc_100K'
+mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K'
 ```
 
-i.
+##
+
+### i.
 ```{r}
 lm1 <- lm(mod1, data = pm2, subset = complete.cases(pm2))
 ```
@@ -74,36 +76,36 @@ lm1 <- lm(mod1, data = pm2, subset = complete.cases(pm2))
 summary(lm1)
 ```
 
-ii. 
+### ii. 
 ```{r}
 pm2 %>% 
   add_residuals(lm1)
 ```
 
-# Forklaring
+## Forklaring
 
-i.
-ii.
+### i.
+### ii.
 
-# Teste for heteroskedastisitet 
+## Teste for heteroskedastisitet 
 
-i. 
+### i. 
 ```{r}
 bptest(lm1)
 ```
 
 
-
-
 ## Vet ikke om denne er riktig engang lol 
-ii. Dersom p-verdien er større enn 0.05 kan vi forkaste H0 og dermed kan har vi heteroskedastisitet. I denne testen har vi ikke heteroskedastisitet. 
+
+### ii. 
+Dersom p-verdien er større enn 0.05 kan vi forkaste H0 og dermed kan vi ha heteroskedastisitet. I denne testen har vi ikke heteroskedastisitet siden p-verdien er veldig lav.
 
 ```{r}
 library(gvlma)
 gvlma(lm1)
 ```
 
-iii.
+### iii.
 
 ```{r}
 coeftest(lm1)
@@ -114,14 +116,14 @@ vcovHC(lm1)
 ```
 
 
-iv.
+### iv.
 
 ```{r}
 pm2 <- pm2 %>% 
   add_residuals(lm1)
 ```
 
-v.
+### v.
 
 ```{r}
 pm2 <- pm2 %>%
@@ -129,48 +131,48 @@ pm2 <- pm2 %>%
 ```
 
 
-vi.
+### vi.
 
 ```{r}
-pm2 <- pm2 %>%  mutate(fylke = substr(knr, start = 1, stop = 2))
+pm2 <- pm2 %>% 
+  mutate(fylke = substr(knr, start=1, stop=2))
 
 pm2 <- pm2 %>% 
-filter(fylke %in% c("01", "02", "03", "11", "12"))
+  filter(fylke %in% c("01", "02", "03", "11", "12"))
 ```
 
 
-
-vii-x
+### vii-x
 ```{r}
 pm2 %>% 
   unnest(c(fylke)) %>% 
   group_by(fylke, aar_d) %>%
   summarise(mean_fylke = mean(resid)) %>% 
-  ggplot(mapping = aes(x = aar_d, y= mean_fylke, colour=fylke)) + geom_line(lwd=1)+
+  ggplot(mapping = aes(x = aar_d, y= mean_fylke, colour=fylke))+
   geom_line(lwd=1)+
   geom_hline(yintercept=0, colour = "white")+
   theme(legend.position= "bottom")
 ```
 
 
-# Dummy 
+## Dummy 
 
-i og ii.
+### i og ii.
 
 ```{r}
-mod2 <- 'pm2 ~ aar_f*fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_i_mf + Trade_pc_100K'
+mod2 <- 'pm2 ~ aar_f*fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K'
 lm2 <- lm(mod2, data = pm2)
 summary(lm2)
 ```
 
-iii.
+### iii.
 
 ```{r}
 pm2 <- pm2 %>% 
   mutate(res_m2 = resid(lm2))
 ```
 
-iv
+### iv.
 
 ```{r}
 pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>% 
@@ -182,11 +184,13 @@ pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>%
   facet_wrap(~fylke)
 ```
 
-i., ii.
+## Diskusjon
 
+### i.
 
-iii.
+### ii.
 
+### iii.
 
 ```{r}
 pm2 %>% filter(knr %in% c("11")) %>% 
@@ -198,12 +202,12 @@ pm2 %>% filter(knr %in% c("11")) %>%
   theme(legend.position='bottom')
 ```
 
+##
 
-i
-
+### i.
 
 ```{r}
-pm2 %>% filter(knr %in% c("1119", "1120", "1127", "1121", "1130", "1135", "1106", "1149")) %>% 
+pm2 %>% filter(knr %in% c("1106", "1119", "1120", "1121", "1127", "1130", "1135",  "1149")) %>% 
   ggplot(mapping=aes(x = aar_d, y = res_m2)) +
   geom_line(aes(group = knavn)) +
   scale_size_manual(values = c(seq(2.0, 0.5, by = -0.1))) +
@@ -212,11 +216,22 @@ pm2 %>% filter(knr %in% c("1119", "1120", "1127", "1121", "1130", "1135", "1106"
 ```
 
 
-ii. 
+### ii. 
 
 # Modell for hvert år
 
+### i og ii.
 
+```{r}
+pm2_n <- pm2 %>% 
+  group_by(aar) %>% 
+  select(pm2, fnr, knr, aar_f, Menn_ya_p, Kvinner_ya_p, Total_ya_p, inc_k5, inc_k5, uni_k_mf, uni_l_mf, Trade_pc_100K) %>% 
+  nest()
+```
+
+```{r}
+pm2_n
+```
 
 
 

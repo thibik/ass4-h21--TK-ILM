@@ -363,7 +363,7 @@ head(uni_p, n=5)
 uni_p <- uni_p %>%
   mutate(nivaa = fct_recode(nivaa, 
                        "uni_k" = "Universitets- og høgskolenivå, kort",
-                       "uni_i" = "Universitets- og høgskolenivå, lang"))
+                       "uni_l" = "Universitets- og høgskolenivå, lang"))
 ```
 
 
