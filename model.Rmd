@@ -220,19 +220,6 @@ pm2 %>% filter(knr %in% c("1106", "1119", "1120", "1121", "1127", "1130", "1135"
 
 # Modell for hvert år
 
-<<<<<<< HEAD
-### i og ii.
-
-```{r}
-pm2_n <- pm2 %>% 
-  group_by(aar) %>% 
-  select(pm2, fnr, knr, aar_f, Menn_ya_p, Kvinner_ya_p, Total_ya_p, inc_k5, inc_k5, uni_k_mf, uni_l_mf, Trade_pc_100K) %>% 
-  nest()
-```
-
-```{r}
-pm2_n
-=======
 ```{r}
 pm2_n <- pm2 %>% 
   group_by(aar)  %>% 
@@ -248,7 +235,6 @@ pm2_n
 ```{r}
 pm2_n$data [[1]] %>%
   head(n = 5)
->>>>>>> 23646c0574853226768a2f529ee9f9d8c51ad91c
 ```
 
 ```{r}
