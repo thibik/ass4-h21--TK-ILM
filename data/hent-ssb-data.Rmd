@@ -451,8 +451,12 @@ pm2 %>%
 ```
 
 ```{r}
-write.csv(pm2, "pm2.csv")
+# bruk write_csv fra tidyverse
+write_csv(pm2, "pm2.csv")
 ```
 
+```{r, echo = FALSE}
+#siste
+```
 
 

@@ -108,11 +108,13 @@ gvlma(lm1)
 ### iii.
 
 ```{r}
-coeftest(lm1)
+#coeftest(lm1)
+# robust standard error
+coeftest(lm1, vcov = vcovHC(lm1, type = "HC3"))
 ```
 
 ```{r}
-vcovHC(lm1)
+#vcovHC(lm1)
 ```
 
 
@@ -137,14 +139,17 @@ pm2 <- pm2 %>%
 pm2 <- pm2 %>% 
   mutate(fylke = substr(knr, start=1, stop=2))
 
-pm2 <- pm2 %>% 
-  filter(fylke %in% c("01", "02", "03", "11", "12"))
+# Her overskriver dere pm2. Bedre å bare filtrere før plot
+# pm2 <- pm2 %>% 
+#   filter(fylke %in% c("01", "02", "03", "11", "12"))
 ```
 
 
 ### vii-x
 ```{r}
 pm2 %>% 
+  # legger filter() inn her
+  filter(fylke %in% c("01", "02", "03", "11", "12")) %>% 
   unnest(c(fylke)) %>% 
   group_by(fylke, aar_d) %>%
   summarise(mean_fylke = mean(resid)) %>% 
@@ -160,6 +165,7 @@ pm2 %>%
 ### i og ii.
 
 ```{r}
+# Da er pm2 fremdeles klar til bruk
 mod2 <- 'pm2 ~ aar_f*fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K'
 lm2 <- lm(mod2, data = pm2)
 summary(lm2)
@@ -193,7 +199,17 @@ pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>%
 ### iii.
 
 ```{r}
-pm2 %>% filter(knr %in% c("11")) %>% 
+# Vi trenger aar some date object
+pm2 <- pm2 %>% 
+  mutate(
+    aar_d = date(paste0(aar, "-01-01"))
+  )
+```
+
+
+```{r}
+# endret fra knr til fylke
+pm2 %>% filter(fylke %in% c("11")) %>% 
   ggplot(mapping=aes(x = aar_d, y = res_m2)) +
   scale_color_viridis(discrete=TRUE, option = "D") +
   geom_line(aes(group = knavn, colour = knavn, size = knavn)) +
@@ -207,10 +223,13 @@ pm2 %>% filter(knr %in% c("11")) %>%
 ### i.
 
 ```{r}
-pm2 %>% filter(knr %in% c("1106", "1119", "1120", "1121", "1127", "1130", "1135",  "1149")) %>% 
+pm2 %>% 
+  filter(knr %in% c("1106", "1119", "1120", "1121", "1127", "1130", "1135",  "1149")) %>% 
   ggplot(mapping=aes(x = aar_d, y = res_m2)) +
-  geom_line(aes(group = knavn)) +
-  scale_size_manual(values = c(seq(2.0, 0.5, by = -0.1))) +
+  scale_color_viridis(discrete = TRUE, option = "D") +
+  # legger til colour og size for å skille dem
+  geom_line(aes(group = knavn, colour = knavn, size = knavn)) +
+  scale_size_manual(values = c(seq(0.6, 2.0, by = 0.2))) +
   geom_hline(yintercept = 0) +
   theme(legend.position="bottom")
 ```
@@ -222,8 +241,10 @@ pm2 %>% filter(knr %in% c("1106", "1119", "1120", "1121", "1127", "1130", "1135"
 
 ```{r}
 pm2_n <- pm2 %>% 
-  group_by(aar)  %>% 
-  select(pm2, fnr, knr, aar, aar_f, Menn_ya_p, Kvinner_ya_p,Total_ya_p, inc_k1, inc_k5, uni_k_mf, uni_l_mf, Trade_pc_100k) %>% 
+  # Velg først variablene, så group på aar_d. Endret Trade_pc_100k til Trade_pc_100K
+  select(pm2, fnr, knr, aar, aar_f, aar_d, Menn_ya_p, Kvinner_ya_p,Total_ya_p, 
+         inc_k1, inc_k5, uni_k_mf, uni_l_mf, Trade_pc_100K) %>% 
+    group_by(aar_d)  %>% 
   nest()
 ```
 
@@ -238,8 +259,9 @@ pm2_n$data [[1]] %>%
 ```
 
 ```{r}
+# data = a_df ellers ingen funksjon
 kom_model <- function (a_df) {
-  lm(pm2 ~ fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100k, data = pm2)
+  lm(pm2 ~ fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K, data = a_df)
 }
 ```
 
@@ -249,29 +271,33 @@ pm2_n <- pm2_n %>%
 ```
 
 ```{r}
-kom_model(pm2_n$aar) %>% 
-  summary()
+# kom_model(pm2_n) %>% 
+#   summary()
 ```
 
 ```{r}
-pm2_n %>% 
-  filter(aar%in% c("2008")) %>% 
-  .$model %>% 
-  map_df(glance) %>% 
-  print()
+# pm2_n %>% 
+#   filter(aar_d %in% c("2008-01-01")) %>% 
+#   .$model %>% 
+#   map_df(glance) %>% 
+#   print()
 ```
 
 ```{r}
 mod_sum <- pm2_n %>% 
-  filter(aar %in% c("2008", "2009", "2011", "2012", "2013", "2014", "2015", "2016", "2017")) %>% 
+  # unødvendig
+  # filter(aar %in% c("2008", "2009", "2011", "2012", "2013", "2014", "2015", "2016", "2017")) %>% 
   mutate(mod_summary = map (.x = model, .f = glance)) %>% 
   unnest(mod_summary) %>% 
   print ()
 ```
 
 ```{r}
-coef_df <- mod_sum %>% 
-  map_df() %>% 
-  as.tibble()
+# henter ut model list column
+coef_df <- mod_sum$model %>% 
+  # argumentet 1 gir oss koeffisientene, 2 residualene etc
+  map_df(1) %>% 
+  tibble()
 ```
 
+Da er det bare avslutningen av oppgaven som gjenstår ;-) Husk også å besvare diverse spørsmålsom ikke er ren koding.
