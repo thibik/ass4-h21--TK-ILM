@@ -319,7 +319,7 @@ coef_df_long <- coef_df %>%
 coef_df_long %>% 
   select(aar, variables, coef) %>% 
   filter(
-    variables %>% c("fnr02", "fnr03", "fnr04", "fnr10", "fnr11", "fnr12", "fnr14")
+    variables %in% c("fnr02", "fnr03", "fnr04", "fnr10", "fnr11", "fnr12", "fnr14")
   ) %>% 
   ggplot(mapping = aes(x = aar, y = coef, colour = variables)) +
   scale_color_viridis(discrete = TRUE, option = "D") + 
