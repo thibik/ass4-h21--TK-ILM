@@ -309,6 +309,15 @@ coef_df <- mod_sum$model %>%
   tibble()
 ```
 
+
+```{r}
+coef_df <- coef_df %>% 
+  mutate(
+    aar = ymd(2008:2017, "-01-01", sep = "")
+  ) %>% 
+  select(aar, everything())
+```
+
 ### ii.
 
 ### iii.
