@@ -180,8 +180,10 @@ pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>%
 ## 0-linjen: Diskusjon
 
 ### i.
+Kvaliteten til modellen er preget av store variasjoner ettersom relevante variabler ikke er inkludert etter filtrering. Konklusjonen er dermed at modellen har forbedringspotensiale. 
 
 ### ii.
+Som presentert i svaret over, mangler modellen sannelig viktige variabler. 
 
 ### iii.
 
@@ -335,6 +337,7 @@ coef_df_long %>%
 
 
 ### v.
+2014 var preget av oljekrise, som igjen hadde en påvirking på prisutvikling. Prisen på olje gikk ned, og flere i oljebransjen mistet jobbene sine. Stavanger by ble dermed også preget ettersom det er en populær by kjent for olje og oljeindustri. 
 
 ## Modell; coef_df_long
 
@@ -356,4 +359,3 @@ coef_df_long %>%
 ### ii.
 
 
-Da er det bare avslutningen av oppgaven som gjenstår ;-) Husk også å besvare diverse spørsmålsom ikke er ren koding.
