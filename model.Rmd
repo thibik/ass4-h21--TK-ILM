@@ -71,7 +71,7 @@ mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trad
 lm1 <- lm(mod1, data = pm2, subset = complete.cases(pm2))
 ```
 
-```{r}
+```{r lm1}
 summary(lm1)
 ```
 
@@ -84,8 +84,11 @@ pm2 %>%
 ## Forklaring av modell og diskusjon av fortegnet. 
 
 ### i. 
+Års-koeffisientene viser hvor mye $y$ (pm2) øker i kvadratmeter fra år til år. I 2009 vil økningen være 104.15, i 2010 908, i 2011 1663.93, osv. opp til år 2017 hvor modellen viser en økning på 5146.33 per kvadratmeter. 
 
 ### ii.
+Vi ser at alle fortegnene er positive i modellen, utenom skjæringspunktet, inc_k1 og uni_k_mf.
+De positive fortegnene illustrerer en økning i $y$ (pm2) fra år til år, som nevnt over. Uni_k_mf med negativt fortegn viser at personer som er bosatt i et område med lavere kvadratmeterpris, også har lavere utdanning. Videre er det to kvintiler i tabellen. De to kvintilene illustrerer ulikt nivå hvor kvintil 1, som har et negtivt fortegn, både er mindre i tall (etter navnet "inc_k**1**") og i utfallet av tabellen (-376.99). Den andre kvintilen, inc_k5, er større både i tall og i utfallet illustrert i tabellen (194.35). 
 
 ## Heteroskedastisitet 
 
