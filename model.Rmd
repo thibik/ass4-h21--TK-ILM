@@ -294,12 +294,11 @@ coef_df <- mod_sum$model %>%
   tibble()
 ```
 
-
 ```{r angivelse av år}
-coef_df <- coef_df %>% 
+coef_df <- coef_df %>%
   mutate(
-    aar = ymd(paste(2008:2017, "-01-01", sep = "")
-              ) %>% 
+    aar = ymd(paste(2008:2017, "-01-01", sep = ""))
+  ) %>%
   select(aar, everything())
 ```
 
@@ -308,8 +307,8 @@ coef_df <- coef_df %>%
 ```{r Pivot Longer}
 coef_df_long <- coef_df %>% 
   pivot_longer(
-    cols = `(intercept)`:`Trade_pc_100k`,
-    names_to = "variables"
+    cols = `(Intercept)`:`Trade_pc_100K`,
+    names_to = "variables",
     values_to = "coef")
 ```
 
