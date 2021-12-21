@@ -320,7 +320,7 @@ coef_df <- coef_df %>%
 
 ### ii.
 
-```{r}
+```{r Pivot Longer}
 coef_df_long <- coef_df %>% 
   pivot_longer(
     cols = `(intercept)`:`Trade_pc_100k`,
@@ -330,6 +330,19 @@ coef_df_long <- coef_df %>%
 
 
 ### iii.
+
+```{r ggplot fylke-faktorvariablers koeffisienter}
+coef_df_long %>% 
+  select(aar, variables, coef) %>% 
+  filter(
+    variables %>% c("fnr02", "fnr03", "fnr04", "fnr10", "fnr11", "fnr12", "fnr14")
+  ) %>% 
+  ggplot(mapping = aes(x = aar, y = coef, colour = variables)) +
+  scale_color_viridis(discrete = TRUE, option = "D") + 
+  geom_line(aes(group = variables), lwd = 1) + 
+  theme(legend.position = 'bottom')
+```
+
 
 ### iv.
 
