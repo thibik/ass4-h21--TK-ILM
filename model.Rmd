@@ -329,7 +329,7 @@ coef_df_long %>%
 
 
 ### iv.
-
+Grafen viser en prisstigning for fnr03, hvor fnr02 har hatt en stabil utvikling og opplevde prisstigning fra 2015 til 2017. De resterende fylkene viser en nedadgående prisutvikling  i perioden rundt 2012 til 2017. I perioden før dette var samtlige fylker relativt stabile i sin utvikling. 
 
 ### v.
 2014 var preget av oljekrise, som igjen hadde en påvirking på prisutvikling. Prisen på olje gikk ned, og flere i oljebransjen mistet jobbene sine. Stavanger by ble dermed også preget ettersom det er en populær by kjent for olje og oljeindustri. 
@@ -342,7 +342,7 @@ coef_df_long %>%
 coef_df_long %>% 
   select(aar, variables, coef) %>% 
   filter(
-    variables %in% c("total_ya_p", "inc_k1", "inc_k5", "uni_k_mf", "Trade_pc_100k")
+    variables %in% c("Total_ya_p", "inc_k1", "inc_k5", "uni_k_mf", "Trade_pc_100K")
   ) %>% 
   ggplot(mapping = aes(x = aar, y = coef, colour = variables)) + 
   scale_color_viridis(discrete = TRUE, option = "D") + 
@@ -352,5 +352,5 @@ coef_df_long %>%
 
 
 ### ii.
-
+Grafen viser at **inc_k5** og **uni_k_mf** har vært mest stabile over tid. **Inc_k1** viser en relativt stabil variasjon, hvor årene 2012 til 2015 viser størst variasjon. **Total_ya_p** viser stabilitet frem til 2012 hvor grafen viser et lite oppsving med samme scenario i 2014, før grafen igjen stabiliseres i 2016. Avlutningsvis, viser **Trade_pc_100K** størst variasjon preget av både oppsving og nedsving fra 2012 til 2017. 
 
