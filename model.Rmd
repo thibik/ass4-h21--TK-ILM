@@ -39,7 +39,6 @@ pm2 <- pm2 %>%
 head(pm2)
 ```
 
-#  mangler vi FNR????
 
 ```{r ny faktor}
 pm2 %>% 
@@ -61,7 +60,7 @@ pm2 <- pm2 %>%
 head(pm2, n = 4)
 ```
 
-```{r mod 1}
+```{r Definering av funksjon}
 mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K'
 ```
 
@@ -263,7 +262,6 @@ pm2_n$data [[1]] %>%
 ### i
 
 ```{r kom_model}
-# data = a_df ellers ingen funksjon
 kom_model <- function (a_df) {
   lm(pm2 ~ fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K, data = a_df)
 }
