@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = FALSE, include = FALSE)
 pm2 <- read_csv("data/pm2.csv", show_col_types = FALSE)
 ```
 
-```{r}
+```{r konvertering}
 pm2 <- pm2 %>% 
   mutate(
     fnr = str_sub(knr, 1,2),
@@ -39,10 +39,9 @@ pm2 <- pm2 %>%
 head(pm2)
 ```
 
+#  mangler vi FNR????
 
-
-
-```{r}
+```{r ny faktor}
 pm2 %>% 
   mutate(
     fnr = parse_factor(fnr, levels =fnr),
@@ -50,25 +49,26 @@ pm2 %>%
   )
 ```
 
-```{r}
+```{r skalering}
 pm2 <- pm2 %>% 
   mutate(
     Trade_pc_100K = Trade_p/100000
   )
 ```
 
+
 ```{r}
 head(pm2, n = 4)
 ```
 
-```{r}
+```{r mod 1}
 mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K'
 ```
 
 ## Modell
 
 ### i.
-```{r}
+```{r modell 1}
 lm1 <- lm(mod1, data = pm2, subset = complete.cases(pm2))
 ```
 
@@ -82,7 +82,7 @@ pm2 %>%
   add_residuals(lm1)
 ```
 
-## Forklaring av modell
+## Forklaring av modell og diskusjon av fortegnet. 
 
 ### i. 
 
@@ -91,7 +91,7 @@ pm2 %>%
 ## Heteroskedastisitet 
 
 ### i. 
-```{r}
+```{r bptest}
 bptest(lm1)
 ```
 
@@ -105,7 +105,7 @@ gvlma(lm1)
 
 ### iii.
 
-```{r}
+```{r Robust Standard Report}
 #coeftest(lm1)
 # robust standard error
 coeftest(lm1, vcov = vcovHC(lm1, type = "HC3"))
@@ -125,7 +125,7 @@ pm2 <- pm2 %>%
 
 ### v.
 
-```{r}
+```{r ny variabel}
 pm2 <- pm2 %>%
   mutate(aar_d =make_date(aar))
 ```
@@ -133,7 +133,7 @@ pm2 <- pm2 %>%
 
 ### vi.
 
-```{r}
+```{r filtrering}
 pm2 <- pm2 %>% 
   mutate(fylke = substr(knr, start=1, stop=2))
 
@@ -144,7 +144,7 @@ pm2 <- pm2 %>%
 
 
 ### vii-x
-```{r}
+```{r legend og horisontal linje}
 pm2 %>% 
   # legger filter() inn her
   filter(fylke %in% c("01", "02", "03", "11", "12")) %>% 
@@ -158,11 +158,11 @@ pm2 %>%
 ```
 
 
-## Dummy; Fylke og år 
+## Dummy: Fylke og år 
 
 ### i & ii.
 
-```{r}
+```{r dummy og generering}
 # Da er pm2 fremdeles klar til bruk
 mod2 <- 'pm2 ~ aar_f*fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K'
 lm2 <- lm(mod2, data = pm2)
@@ -178,7 +178,7 @@ pm2 <- pm2 %>%
 
 ### iv.
 
-```{r}
+```{r filtrering av fylker}
 pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>% 
   ggplot(mapping = aes(x= aar_d, y=res_m2))+
   geom_line(aes(group = knavn)) + 
@@ -188,7 +188,7 @@ pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>%
   facet_wrap(~fylke)
 ```
 
-## 0-linjen; Diskusjon
+## 0-linjen: Diskusjon
 
 ### i.
 
@@ -196,7 +196,7 @@ pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>%
 
 ### iii.
 
-```{r}
+```{r filtrering fylke 11}
 # Vi trenger aar some date object
 pm2 <- pm2 %>% 
   mutate(
@@ -220,7 +220,7 @@ pm2 %>% filter(fylke %in% c("11")) %>%
 
 ### i.
 
-```{r}
+```{r utvalgte kommuner}
 pm2 %>% 
   filter(knr %in% c("1106", "1119", "1120", "1121", "1127", "1130", "1135",  "1149")) %>% 
   ggplot(mapping=aes(x = aar_d, y = res_m2)) +
@@ -239,7 +239,7 @@ pm2 %>%
 
 ### i.
 
-```{r}
+```{r datasett 2008-2017}
 pm2_n <- pm2 %>% 
   # Velg først variablene, så group på aar_d. Endret Trade_pc_100k til Trade_pc_100K
   select(pm2, fnr, knr, aar, aar_f, aar_d, Menn_ya_p, Kvinner_ya_p,Total_ya_p, 
@@ -262,7 +262,7 @@ pm2_n$data [[1]] %>%
 
 ### i
 
-```{r}
+```{r kom_model}
 # data = a_df ellers ingen funksjon
 kom_model <- function (a_df) {
   lm(pm2 ~ fnr + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K, data = a_df)
@@ -281,7 +281,7 @@ pm2_n <- pm2_n %>%
 
 ### i.
 
-```{r}
+```{r mod summary}
 # pm2_n %>% 
 #   filter(aar_d %in% c("2008-01-01")) %>% 
 #   .$model %>% 
@@ -301,7 +301,7 @@ mod_sum <- pm2_n %>%
 ## Coef_df
 
 ### i.
-```{r}
+```{r ny variabel, date}
 # henter ut model list column
 coef_df <- mod_sum$model %>% 
   # argumentet 1 gir oss koeffisientene, 2 residualene etc
