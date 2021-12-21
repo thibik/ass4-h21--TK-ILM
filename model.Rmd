@@ -297,9 +297,7 @@ coef_df <- mod_sum$model %>%
 
 ```{r angivelse av år}
 coef_df <- coef_df %>% 
-  mutate(
-    aar = ymd(paste(2008:2017, "-01-01", sep = "")
-  ) %>% 
+  mutate(aar = ymd(paste(2008:2017, "-01-01", sep = "")) %>% 
   select(aar, everything())
 ```
 
