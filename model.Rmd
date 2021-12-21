@@ -346,11 +346,25 @@ coef_df_long %>%
 
 ### iv.
 
+
 ### v.
 
 ## Modell; coef_df_long
 
 ### i.
+
+```{r ggplot tidligere variabler}
+coef_df_long %>% 
+  select(aar, variables, coef) %>% 
+  filter(
+    variables %in% c("total_ya_p", "inc_k1", "inc_k5", "uni_k_mf", "Trade_pc_100k")
+  ) %>% 
+  ggplot(mapping = aes(x = aar, y = coef, colour = variables)) + 
+  scale_color_viridis(discrete = TRUE, option = "D") + 
+  geom_line(aes(group = variables), lwd = 1) + 
+  theme(legend.position = 'bottom')
+```
+
 
 ### ii.
 
