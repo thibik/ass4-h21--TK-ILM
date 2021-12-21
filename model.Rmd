@@ -267,10 +267,6 @@ pm2_n <- pm2_n %>%
   mutate(model = map(data, .f = kom_model))
 ```
 
-```{r}
-kom_model(pm2_n) %>% 
-  summary()
-```
 
 ### i.
 
