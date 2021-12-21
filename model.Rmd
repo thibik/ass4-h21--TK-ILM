@@ -310,7 +310,7 @@ coef_df <- mod_sum$model %>%
 ```
 
 
-```{r}
+```{r angivelse av år}
 coef_df <- coef_df %>% 
   mutate(
     aar = ymd(2008:2017, "-01-01", sep = "")
@@ -319,6 +319,15 @@ coef_df <- coef_df %>%
 ```
 
 ### ii.
+
+```{r}
+coef_df_long <- coef_df %>% 
+  pivot_longer(
+    cols = `(intercept)`:`Trade_pc_100k`,
+    names_to = "variables"
+    values_to = "coef")
+```
+
 
 ### iii.
 
