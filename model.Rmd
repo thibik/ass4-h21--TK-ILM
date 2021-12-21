@@ -65,7 +65,7 @@ head(pm2, n = 4)
 mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trade_pc_100K'
 ```
 
-##
+## Modell
 
 ### i.
 ```{r}
@@ -82,20 +82,18 @@ pm2 %>%
   add_residuals(lm1)
 ```
 
-## Forklaring
+## Forklaring av modell
 
-### i.
+### i. 
+
 ### ii.
 
-## Teste for heteroskedastisitet 
+## Heteroskedastisitet 
 
 ### i. 
 ```{r}
 bptest(lm1)
 ```
-
-
-## Vet ikke om denne er riktig engang lol 
 
 ### ii. 
 Dersom p-verdien er større enn 0.05 kan vi forkaste H0 og dermed kan vi ha heteroskedastisitet. I denne testen har vi ikke heteroskedastisitet siden p-verdien er veldig lav.
@@ -160,9 +158,9 @@ pm2 %>%
 ```
 
 
-## Dummy 
+## Dummy; Fylke og år 
 
-### i og ii.
+### i & ii.
 
 ```{r}
 # Da er pm2 fremdeles klar til bruk
@@ -190,7 +188,7 @@ pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>%
   facet_wrap(~fylke)
 ```
 
-## Diskusjon
+## 0-linjen; Diskusjon
 
 ### i.
 
@@ -218,7 +216,7 @@ pm2 %>% filter(fylke %in% c("11")) %>%
   theme(legend.position='bottom')
 ```
 
-##
+## Figur
 
 ### i.
 
@@ -239,6 +237,8 @@ pm2 %>%
 
 # Modell for hvert år
 
+### i.
+
 ```{r}
 pm2_n <- pm2 %>% 
   # Velg først variablene, så group på aar_d. Endret Trade_pc_100k til Trade_pc_100K
@@ -252,11 +252,15 @@ pm2_n <- pm2 %>%
 pm2_n
 ```
 
-
 ```{r}
 pm2_n$data [[1]] %>%
   head(n = 5)
 ```
+
+
+## pm2$n_data
+
+### i
 
 ```{r}
 # data = a_df ellers ingen funksjon
@@ -275,6 +279,8 @@ pm2_n <- pm2_n %>%
 #   summary()
 ```
 
+### i.
+
 ```{r}
 # pm2_n %>% 
 #   filter(aar_d %in% c("2008-01-01")) %>% 
@@ -292,6 +298,9 @@ mod_sum <- pm2_n %>%
   print ()
 ```
 
+## Coef_df
+
+### i.
 ```{r}
 # henter ut model list column
 coef_df <- mod_sum$model %>% 
@@ -299,5 +308,20 @@ coef_df <- mod_sum$model %>%
   map_df(1) %>% 
   tibble()
 ```
+
+### ii.
+
+### iii.
+
+### iv.
+
+### v.
+
+## Modell; coef_df_long
+
+### i.
+
+### ii.
+
 
 Da er det bare avslutningen av oppgaven som gjenstår ;-) Husk også å besvare diverse spørsmålsom ikke er ren koding.
