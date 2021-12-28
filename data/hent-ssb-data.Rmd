@@ -10,7 +10,7 @@ output:
 lang: no-NB
 ---
 ```{r}
-knitr::opts_chunk$set(eval=FALSE)
+knitr::opts_chunk$set(eval=TRUE)
 ```
 
 ```{r Setup}
@@ -19,7 +19,7 @@ library(PxWebApiData)
 library(tidyverse)
 library(lubridate)
 })
-knitr::opts_chunk$set(echo=FALSE, include=FALSE)
+knitr::opts_chunk$set(echo=TRUE, include=TRUE)
 ```
 
 
@@ -81,7 +81,10 @@ pm2 <- pm2 %>%
 pm2 %>% 
   map_df(is.na) %>% 
   map_df(sum) %>% 
-  as.tibble()
+# as.tibble() har gått ut på dato
+# nå heter den as_tibble()  
+#    as.tibble()
+  as_tibble()
 ```
 
 ```{r}
@@ -345,13 +348,22 @@ uni_p_raw <- ApiData(
 uni_p <- uni_p_raw
 ```
 
+```{r}
+# Jeg vil foreslå å endre navn på første komponent i uni_p så slipper en
+# tekst-strenger som går langt ut i margen. Disse navnene til SSB er ikke særlig
+# R vennlige
+names(uni_p)[[1]] <- "desc"
+```
+
 
 ```{r}
+# bruker desc for å referere til første element i uni_p listen
+# slipper uendelig lange navn som går utenfor margen
 uni_p <- tibble(
   knr = uni_p$dataset$Region,
   aar = uni_p$dataset$Tid,
-  Kjonn = uni_p$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$kjønn,
-  nivaa = uni_p$`09429: Personer 16 år og over, etter region, nivå, kjønn, statistikkvariabel og år`$nivå,
+  Kjonn = uni_p$desc$kjønn,
+  nivaa = uni_p$desc$nivå,
   uni_p = uni_p$dataset$value
 )
 
