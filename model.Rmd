@@ -1,9 +1,12 @@
 ---
 title: "Assignment 4"
 author:
-  - "Ingrid-Liv Morkken"
-  - "Thibiga Kuddyar"
-output: html_notebook
+- Ingrid-Liv Morkken
+- Thibiga Kuddyar
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r}
@@ -16,7 +19,7 @@ library(lmtest)
 library(sandwich)
 library(viridis)
 })
-knitr::opts_chunk$set(echo = FALSE, include = FALSE)
+knitr::opts_chunk$set(echo = TRUE, include = TRUE)
 ```
 
 # Modeller
@@ -39,7 +42,6 @@ pm2 <- pm2 %>%
 head(pm2)
 ```
 
-
 ```{r ny faktor}
 pm2 %>% 
   mutate(
@@ -55,7 +57,6 @@ pm2 <- pm2 %>%
   )
 ```
 
-
 ```{r}
 head(pm2, n = 4)
 ```
@@ -67,6 +68,7 @@ mod1 <- 'pm2 ~ aar_f + Total_ya_p + inc_k1 + inc_k5 + uni_k_mf + uni_l_mf + Trad
 ## Modell
 
 ### i.
+
 ```{r modell 1}
 lm1 <- lm(mod1, data = pm2, subset = complete.cases(pm2))
 ```
@@ -75,30 +77,42 @@ lm1 <- lm(mod1, data = pm2, subset = complete.cases(pm2))
 summary(lm1)
 ```
 
-### ii. 
+### ii.
+
 ```{r}
 pm2 %>% 
   add_residuals(lm1)
 ```
 
-## Forklaring av modell og diskusjon av fortegnet. 
+## Forklaring av modell og diskusjon av fortegnet.
 
-### i. 
-Års-koeffisientene viser hvor mye $y$ (pm2) øker i kvadratmeter fra år til år. I 2009 vil økningen være 104.15, i 2010 908, i 2011 1663.93, osv. opp til år 2017 hvor modellen viser en økning på 5146.33 per kvadratmeter. 
+### i.
+
+Års-koeffisientene viser hvor mye $y$ (pm2) øker i kvadratmeter fra år til år.
+I 2009 vil økningen være 104.15, i 2010 908, i 2011 1663.93, osv.
+opp til år 2017 hvor modellen viser en økning på 5146.33 per kvadratmeter.
 
 ### ii.
-Vi ser at alle fortegnene er positive i modellen, utenom skjæringspunktet, inc_k1 og uni_k_mf.
-De positive fortegnene illustrerer en økning i $y$ (pm2) fra år til år, som nevnt over. Uni_k_mf med negativt fortegn viser at personer som er bosatt i et område med lavere kvadratmeterpris, også har lavere utdanning. Videre er det to kvintiler i tabellen. De to kvintilene illustrerer ulikt nivå hvor kvintil 1, som har et negtivt fortegn, både er mindre i tall (etter navnet "inc_k**1**") og i utfallet av tabellen (-376.99). Den andre kvintilen, inc_k5, er større både i tall og i utfallet illustrert i tabellen (194.35). 
 
-## Heteroskedastisitet 
+Vi ser at alle fortegnene er positive i modellen, utenom skjæringspunktet, inc_k1 og uni_k\_mf.
+De positive fortegnene illustrerer en økning i $y$ (pm2) fra år til år, som nevnt over.
+Uni_k\_mf med negativt fortegn viser at personer som er bosatt i et område med lavere kvadratmeterpris, også har lavere utdanning.
+Videre er det to kvintiler i tabellen.
+De to kvintilene illustrerer ulikt nivå hvor kvintil 1, som har et negtivt fortegn, både er mindre i tall (etter navnet "inc_k**1**") og i utfallet av tabellen (-376.99).
+Den andre kvintilen, inc_k5, er større både i tall og i utfallet illustrert i tabellen (194.35).
 
-### i. 
+## Heteroskedastisitet
+
+### i.
+
 ```{r bptest}
 bptest(lm1)
 ```
 
-### ii. 
-Dersom p-verdien er større enn 0.05 kan vi forkaste H0 og dermed kan vi ha heteroskedastisitet. I denne testen har vi ikke heteroskedastisitet siden p-verdien er veldig lav.
+### ii.
+
+Dersom p-verdien er større enn 0.05 kan vi forkaste H0 og dermed kan vi ha heteroskedastisitet.
+I denne testen har vi ikke heteroskedastisitet siden p-verdien er veldig lav.
 
 ```{r}
 library(gvlma)
@@ -125,7 +139,6 @@ pm2 <- pm2 %>%
   mutate(aar_d =make_date(aar))
 ```
 
-
 ### vi.
 
 ```{r filtrering}
@@ -133,8 +146,8 @@ pm2 <- pm2 %>%
   mutate(fylke = substr(knr, start=1, stop=2))
 ```
 
-
 ### vii-x
+
 ```{r legend og horisontal linje}
 pm2 %>% 
   filter(fylke %in% c("01", "02", "03", "11", "12")) %>% 
@@ -147,8 +160,7 @@ pm2 %>%
   theme(legend.position= "bottom")
 ```
 
-
-## Dummy: Fylke og år 
+## Dummy: Fylke og år
 
 ### i & ii.
 
@@ -180,10 +192,13 @@ pm2 %>% filter(fnr %in% c("01", "02", "04", "11", "12")) %>%
 ## 0-linjen: Diskusjon
 
 ### i.
-Kvaliteten til modellen er preget av store variasjoner ettersom relevante variabler ikke er inkludert etter filtrering. Konklusjonen er dermed at modellen har forbedringspotensiale. 
+
+Kvaliteten til modellen er preget av store variasjoner ettersom relevante variabler ikke er inkludert etter filtrering.
+Konklusjonen er dermed at modellen har forbedringspotensiale.
 
 ### ii.
-Som presentert i svaret over, mangler modellen sannelig viktige variabler. 
+
+Som presentert i svaret over, mangler modellen sannelig viktige variabler.
 
 ### iii.
 
@@ -193,7 +208,6 @@ pm2 <- pm2 %>%
     aar_d = date(paste0(aar, "-01-01"))
   )
 ```
-
 
 ```{r}
 pm2 %>% filter(fylke %in% c("11")) %>% 
@@ -220,8 +234,17 @@ pm2 %>%
   theme(legend.position="bottom")
 ```
 
-### ii. 
-Modellen viser at Stavanger kommune er overvurdert, og ligger over null-linjen. Forflytter vi oss nærmere Haugesund, ser vi at flere kommuner er undervurdert inkludert Haugesund kommune. 
+### ii.
+
+Modellen viser at Stavanger kommune er overvurdert, og ligger over null-linjen.
+Forflytter vi oss nærmere Haugesund, ser vi at flere kommuner er undervurdert inkludert Haugesund kommune.
+
+> Feil!
+> Det blir omvendt.
+> Husk at det er residualene vi her betrakter.
+> Positive residualer innebærer at modellen har undervurdert prisen, mens negative residualer innebærer at modellen overvurderer prisen.
+> Vår modell ser altså ut til systematisk å undervurdere pm2 i kommunene rundt Stavanger, mens den overvurderer pm2 i kommunene på Haugalandet.
+> Det er et nokså klart tegn på at modellen vår mangler en viktig variabel.
 
 # Modell for hvert år
 
@@ -236,8 +259,8 @@ pm2 <- pm2 %>%
 
 ```{r datasett 2008-2017}
 pm2_n <- pm2 %>% 
-  select(pm2, fnr, knr, aar, aar_f, aar_d, Menn_ya_p, Kvinner_ya_p,Total_ya_p, 
-         inc_k1, inc_k5, uni_k_mf, uni_l_mf, Trade_pc_100K) %>% 
+  select(pm2, fnr, knr, aar, aar_f, aar_d, Menn_ya_p, Kvinner_ya_p,
+         Total_ya_p, inc_k1, inc_k5, uni_k_mf, uni_l_mf, Trade_pc_100K) %>% 
     group_by(aar_d)  %>% 
   nest()
 ```
@@ -251,8 +274,7 @@ pm2_n$data [[1]] %>%
   head(n = 5)
 ```
 
-
-## pm2$n_data
+## pm2\$n_data
 
 ### i
 
@@ -266,7 +288,6 @@ kom_model <- function (a_df) {
 pm2_n <- pm2_n %>% 
   mutate(model = map(data, .f = kom_model))
 ```
-
 
 ### i.
 
@@ -288,6 +309,7 @@ mod_sum <- pm2_n %>%
 ## Coef_df
 
 ### i.
+
 ```{r ny variabel, date}
 coef_df <- mod_sum$model %>% 
   map_df(1) %>% 
@@ -312,7 +334,6 @@ coef_df_long <- coef_df %>%
     values_to = "coef")
 ```
 
-
 ### iii.
 
 ```{r ggplot fylke-faktorvariablers koeffisienter}
@@ -327,12 +348,17 @@ coef_df_long %>%
   theme(legend.position = 'bottom')
 ```
 
-
 ### iv.
-Grafen viser en prisstigning for fnr03, hvor fnr02 har hatt en stabil utvikling og opplevde prisstigning fra 2015 til 2017. De resterende fylkene viser en nedadgående prisutvikling  i perioden rundt 2012 til 2017. I perioden før dette var samtlige fylker relativt stabile i sin utvikling. 
+
+Grafen viser en prisstigning for fnr03, hvor fnr02 har hatt en stabil utvikling og opplevde prisstigning fra 2015 til 2017.
+De resterende fylkene viser en nedadgående prisutvikling i perioden rundt 2012 til 2017.
+I perioden før dette var samtlige fylker relativt stabile i sin utvikling.
 
 ### v.
-2014 var preget av oljekrise, som igjen hadde en påvirking på prisutvikling. Prisen på olje gikk ned, og flere i oljebransjen mistet jobbene sine. Stavanger by ble dermed også preget ettersom det er en populær by kjent for olje og oljeindustri. 
+
+2014 var preget av oljekrise, som igjen hadde en påvirking på prisutvikling.
+Prisen på olje gikk ned, og flere i oljebransjen mistet jobbene sine.
+Stavanger by ble dermed også preget ettersom det er en populær by kjent for olje og oljeindustri.
 
 ## Modell; coef_df_long
 
@@ -350,7 +376,13 @@ coef_df_long %>%
   theme(legend.position = 'bottom')
 ```
 
-
 ### ii.
-Grafen viser at **inc_k5** og **uni_k_mf** har vært mest stabile over tid. **Inc_k1** viser en relativt stabil variasjon, hvor årene 2012 til 2015 viser størst variasjon. **Total_ya_p** viser stabilitet frem til 2012 hvor grafen viser et lite oppsving med samme scenario i 2014, før grafen igjen stabiliseres i 2016. Avlutningsvis, viser **Trade_pc_100K** størst variasjon preget av både oppsving og nedsving fra 2012 til 2017. 
 
+Grafen viser at **inc_k5** og **uni_k\_mf** har vært mest stabile over tid.
+**Inc_k1** viser en relativt stabil variasjon, hvor årene 2012 til 2015 viser størst variasjon.
+**Total_ya_p** viser stabilitet frem til 2012 hvor grafen viser et lite oppsving med samme scenario i 2014, før grafen igjen stabiliseres i 2016.
+Avlutningsvis, viser **Trade_pc_100K** størst variasjon preget av både oppsving og nedsving fra 2012 til 2017.
+
+```{r, echo = FALSE}
+# siste
+```
